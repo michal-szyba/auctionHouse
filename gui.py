@@ -11,7 +11,6 @@ ALL_ITEMS = [
 
 
 def search_items(query: str):
-    # TODO: GET /search?q=query
     return [
         {"id": "1", "name": "Iron sword", "price": 2500},
         {"id": "2", "name": "Steel boots", "price": 2200},
@@ -19,19 +18,14 @@ def search_items(query: str):
 
 
 def buy_item(item_id: str):
-    # TODO: POST /buy
     messagebox.showinfo("Zakup", f"Kupiono przedmiot {item_id}")
 
 
 def create_auction(name, price, increment):
-    # TODO: POST /create-auction
     messagebox.showinfo(
         "Aukcja",
         f"Wystawiono: {name}, cena {price}, przebitka {increment}"
     )
-
-
-# ---------------- UI ----------------
 
 class AuctionApp(tk.Tk):
     def __init__(self):
@@ -56,7 +50,6 @@ class AuctionApp(tk.Tk):
         ]
         self.refresh_items_listbox()
 
-    # ---------- SEARCH ----------
     def create_search_bar(self):
         frame = ttk.Frame(self)
         frame.pack(fill="x", padx=10, pady=10)
@@ -73,7 +66,6 @@ class AuctionApp(tk.Tk):
         for item in items:
             self.add_result_row(item)
 
-    # ---------- RESULTS ----------
     def create_results_list(self):
         container = ttk.LabelFrame(self, text="Wyniki wyszukiwania")
         container.pack(fill="both", expand=True, padx=10, pady=10)
@@ -93,12 +85,10 @@ class AuctionApp(tk.Tk):
             command=lambda: buy_item(item["id"])
         ).pack(side="right")
 
-    # ---------- SELL ----------
     def create_sell_panel(self):
         frame = ttk.LabelFrame(self, text="Wystaw nową aukcję")
         frame.pack(fill="x", padx=10, pady=10)
 
-        # --- SEARCH ITEM ---
         ttk.Label(frame, text="Szukaj przedmiotu").grid(row=0, column=0, sticky="w")
 
         self.item_search_var = tk.StringVar()
@@ -106,24 +96,20 @@ class AuctionApp(tk.Tk):
         search_entry.grid(row=0, column=1, sticky="ew")
         search_entry.bind("<KeyRelease>", self.filter_items)
 
-        # --- LISTBOX ---
         self.items_listbox = tk.Listbox(frame, height=5)
         self.items_listbox.grid(row=1, column=0, columnspan=2, sticky="ew", pady=5)
 
         self.filtered_items = ALL_ITEMS.copy()
         self.refresh_items_listbox()
 
-        # --- PRICE ---
         ttk.Label(frame, text="Cena startowa").grid(row=2, column=0, sticky="w")
         self.sell_price = tk.StringVar()
         ttk.Entry(frame, textvariable=self.sell_price).grid(row=2, column=1)
 
-        # --- INCREMENT ---
         ttk.Label(frame, text="Min. przebitka").grid(row=3, column=0, sticky="w")
         self.sell_increment = tk.StringVar()
         ttk.Entry(frame, textvariable=self.sell_increment).grid(row=3, column=1)
 
-        # --- BUTTON ---
         ttk.Button(
             frame,
             text="Wystaw",
