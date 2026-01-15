@@ -1,6 +1,13 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 
+ALL_ITEMS = [
+    {"id": "1", "name": "Iron sword"},
+    {"id": "2", "name": "Steel boots"},
+    {"id": "3", "name": "Magic staff"},
+    {"id": "4", "name": "Golden helmet"},
+    {"id": "5", "name": "Leather armor"},
+]
 
 
 def search_items(query: str):
@@ -35,6 +42,19 @@ class AuctionApp(tk.Tk):
         self.create_search_bar()
         self.create_results_list()
         self.create_sell_panel()
+
+    def refresh_items_listbox(self):
+        self.items_listbox.delete(0, tk.END)
+        for item in self.filtered_items:
+            self.items_listbox.insert(tk.END, item["name"])
+
+    def filter_items(self, event=None):
+        query = self.item_search_var.get().lower()
+        self.filtered_items = [
+            item for item in ALL_ITEMS
+            if query in item["name"].lower()
+        ]
+        self.refresh_items_listbox()
 
     # ---------- SEARCH ----------
     def create_search_bar(self):
@@ -78,24 +98,39 @@ class AuctionApp(tk.Tk):
         frame = ttk.LabelFrame(self, text="Wystaw nową aukcję")
         frame.pack(fill="x", padx=10, pady=10)
 
-        self.sell_name = tk.StringVar()
+        # --- SEARCH ITEM ---
+        ttk.Label(frame, text="Szukaj przedmiotu").grid(row=0, column=0, sticky="w")
+
+        self.item_search_var = tk.StringVar()
+        search_entry = ttk.Entry(frame, textvariable=self.item_search_var)
+        search_entry.grid(row=0, column=1, sticky="ew")
+        search_entry.bind("<KeyRelease>", self.filter_items)
+
+        # --- LISTBOX ---
+        self.items_listbox = tk.Listbox(frame, height=5)
+        self.items_listbox.grid(row=1, column=0, columnspan=2, sticky="ew", pady=5)
+
+        self.filtered_items = ALL_ITEMS.copy()
+        self.refresh_items_listbox()
+
+        # --- PRICE ---
+        ttk.Label(frame, text="Cena startowa").grid(row=2, column=0, sticky="w")
         self.sell_price = tk.StringVar()
+        ttk.Entry(frame, textvariable=self.sell_price).grid(row=2, column=1)
+
+        # --- INCREMENT ---
+        ttk.Label(frame, text="Min. przebitka").grid(row=3, column=0, sticky="w")
         self.sell_increment = tk.StringVar()
+        ttk.Entry(frame, textvariable=self.sell_increment).grid(row=3, column=1)
 
-        ttk.Label(frame, text="Nazwa").grid(row=0, column=0, sticky="w")
-        ttk.Entry(frame, textvariable=self.sell_name).grid(row=0, column=1)
-
-        ttk.Label(frame, text="Cena startowa").grid(row=1, column=0, sticky="w")
-        ttk.Entry(frame, textvariable=self.sell_price).grid(row=1, column=1)
-
-        ttk.Label(frame, text="Min. przebitka").grid(row=2, column=0, sticky="w")
-        ttk.Entry(frame, textvariable=self.sell_increment).grid(row=2, column=1)
-
+        # --- BUTTON ---
         ttk.Button(
             frame,
             text="Wystaw",
             command=self.submit_auction
-        ).grid(row=3, column=0, columnspan=2, pady=5)
+        ).grid(row=4, column=0, columnspan=2, pady=5)
+
+        frame.columnconfigure(1, weight=1)
 
     def submit_auction(self):
         create_auction(
